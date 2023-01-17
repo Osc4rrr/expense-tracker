@@ -73,19 +73,21 @@ function addTransactionDOM(transaction) {
 
 //Update the balance, income and expense
 function updateValues() {
-  const amounts = transactions.map((transaction) => transaction.amount);
+  const amounts = transactions.map((transaction) => transaction);
+  console.log(amounts);
   const total = amounts
-    .reduce((acc, item) => acc + item, 0)
+    .reduce((acc, item) => acc + item.amount * item.quantity, 0)
     .toLocaleString('es-CL');
 
   const income = amounts
-    .filter((item) => item > 0)
-    .reduce((acc, item) => (acc += item), 0)
+    .filter((item) => item.amount > 0)
+    .reduce((acc, item) => (acc += item.amount * item.quantity), 0)
     .toLocaleString('es-CL');
 
   const expense = (
-    amounts.filter((item) => item < 0).reduce((acc, item) => (acc += item), 0) *
-    -1
+    amounts
+      .filter((item) => item.amount < 0)
+      .reduce((acc, item) => (acc += item.amount * item.quantity), 0) * -1
   ).toLocaleString('es-CL');
 
   balance.innerText = `$${total}`;
