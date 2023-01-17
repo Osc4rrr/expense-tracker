@@ -18,17 +18,15 @@ let transactions =
 function addTransaction(e) {
   e.preventDefault();
 
-  if (text.value.trim() === '' || amount.value.trim() === '') {
+  if (text.value.trim() === '' || amount.value.toString().trim() === '') {
     alert('Please add a text and amount');
   } else {
     const transaction = {
       id: generateID(),
       text: text.value,
-      amount: +amount.value,
+      amount: amount.value.replace('.', ''),
       quantity: +qty.value,
     };
-
-    console.log(transaction);
 
     transactions.push(transaction);
 
@@ -40,6 +38,7 @@ function addTransaction(e) {
 
     text.value = '';
     amount.value = '';
+    qty.value = 1;
   }
 }
 
@@ -59,7 +58,9 @@ function addTransactionDOM(transaction) {
   item.classList.add(transaction.amount < 0 ? 'minus' : 'plus');
 
   item.innerHTML = `
-    ${transaction.text} <span>x${transaction.quantity}</span><span>${sign}${(
+    ${transaction.text} <span>${sign}${Math.abs(
+    transaction.amount
+  ).toLocaleString('es-CL')} x${transaction.quantity}</span><span>${sign}${(
     Math.abs(transaction.amount) * transaction.quantity
   ).toLocaleString(
     'es-CL'
@@ -74,7 +75,6 @@ function addTransactionDOM(transaction) {
 //Update the balance, income and expense
 function updateValues() {
   const amounts = transactions.map((transaction) => transaction);
-  console.log(amounts);
   const total = amounts
     .reduce((acc, item) => acc + item.amount * item.quantity, 0)
     .toLocaleString('es-CL');
@@ -93,6 +93,10 @@ function updateValues() {
   balance.innerText = `$${total}`;
   money_plus.innerText = `$${income}`;
   money_minus.innerText = `$${expense}`;
+
+  if (total == 0 || total < 0) {
+    alert('Your balance now is $0');
+  }
 }
 
 //Remove transactions by ID
